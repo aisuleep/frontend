@@ -3,7 +3,7 @@ import { For, Show } from "solid-js";
 import { styled, useTheme } from "solid-styled-components";
 import { getController } from "@revolt/common";
 
-import { Avatar, Button, ColouredText, Column, Header, IconButton, OverflowingText, Row, Typography, UserStatusGraphic } from "../design";
+import { Avatar, Button, Column, Header, IconButton, OverflowingText, Typography, UserStatusGraphic } from "../design";
 import { API } from "revolt.js";
 import { useTranslation } from "@revolt/i18n";
 import { Markdown, TextWithEmoji } from "@revolt/markdown";
@@ -26,6 +26,7 @@ props.theme!.colours["component-modal-background"]};
   width: 425px;
   height: 550px;
   overflow-y: clip;
+
   .header {
     display: flex;
     flex-direction: column;
@@ -92,9 +93,9 @@ export function UserCard(
         </ProfileBanner>
             <Actions>
               <Show when={
-                props.user.relationship != "Friend" 
-                && props.user.relationship != "Outgoing" 
-                && props.user.relationship != "Incoming" 
+                props.user.relationship !== "Friend" 
+                && props.user.relationship !== "Outgoing" 
+                && props.user.relationship !== "Incoming" 
                 && !props.user.self
                 && !props.user.bot
               }>
@@ -104,7 +105,7 @@ export function UserCard(
                 {t("app.context_menu.add_friend")}
                 </Button>
               </Show>
-              <Show when={props.user.relationship == "Incoming"
+              <Show when={props.user.relationship === "Incoming"
                 }>
                 <Button
                   onClick={() => {
@@ -117,8 +118,8 @@ export function UserCard(
                 </Button>
               </Show>
               <Show when={
-                props.user.relationship == "Outgoing"
-                || props.user.relationship == "Incoming"
+                props.user.relationship === "Outgoing"
+                || props.user.relationship === "Incoming"
                 }>
                 <Button
                   onClick={() => {
@@ -131,7 +132,7 @@ export function UserCard(
                 </Button>
               </Show>
               <Show when={
-                props.user.relationship == "Friend" 
+                props.user.relationship === "Friend" 
               }>
                 <Button
                   onClick={() => {
@@ -169,26 +170,28 @@ export function UserCard(
                   {t("app.settings.server_pages.roles.title")}
                 </Typography>
               </Title>
-              <For each={props.member!.orderedRoles}>
+              <For each={props.member!.orderedRoles.reverse()}>
                 {(role) => (
-                  <Role>
-                    <Title>
-                      <Typography variant="modal-description">
-                        {role.name}
-                      </Typography>
-                    </Title>
-                    <div
-                      onClick={() =>
-                        props.member!.edit({
-                          roles: [...roleIds()].filter((id) => id !== role.id),
-                        })
-                      }
-                    >
-                      <Dot
-                        colour={role.colour ?? useTheme().colours["foreground"]}
-                      />
-                    </div>
-                  </Role>
+                  <div
+                    onClick={() =>
+                      props.member!.edit({
+                        roles: [...roleIds()].filter((id) => id !== role.id),
+                      })
+                    }
+                  >
+                    <Role>
+                      
+                      <Title>
+                        <Typography variant="modal-description">
+                          {role.name}
+                        </Typography>
+                      </Title>
+                      
+                        <Dot
+                          colour={role.colour ?? useTheme().colours["foreground"]}
+                        />
+                    </Role>
+                  </div>
                 )}
               </For>
             </SmallCard>
@@ -224,7 +227,6 @@ export function UserCard(
               </Title>
             </SmallCard>
             </Show>
-            
           </SmallCards>
           <Card>
             <Title>
@@ -232,7 +234,6 @@ export function UserCard(
                   {t("app.settings.pages.profile.info")}
                 </Typography>
             </Title>
-            <span class="text">
               <Show when={profile()?.content}>
                 <Markdown content= {profile()!.content!}/>
               </Show>
@@ -241,7 +242,6 @@ export function UserCard(
                       {t("app.special.popovers.user_profile.empty")}
                   </OverflowingText>
               </Show>
-            </span>
           </Card>
         </ProfileContent>
     </Base>
@@ -303,7 +303,7 @@ const SmallCards = styled.div`
 display: grid;
 grid-template-columns: 1fr 1fr;
 grid-template-rows: auto auto; 
-gap: 8px;
+column-gap: 8px;
 `;
 
 const Title = styled.div`
@@ -319,14 +319,15 @@ const Role = styled.div`
 `;
 
 const Dot = styled.span<{colour: string}>`
-    color: ${(props) => props.colour};
-    height: 16px;
-    width: 16px;
+    display: inline-block;
+    background: ${(props) => props.colour};
+    height: 12px;
+    width: 12px;
     border-radius: 50%;
     -webkit-text-fill-color: "transparent";
     background-clip: "text";
     -webkit-background-clip: "text";
-    outline: solid 2px blue;
+    outline: solid 1px ${(props) => props.theme!.colours["foreground"]};
 `;
 
 const SmallCard = styled.div`
@@ -334,8 +335,10 @@ const SmallCard = styled.div`
   display: flex;
   flex-direction: column;
   height: 140px;
+  overflow-y: clip;
   border-radius: ${(props) => props.theme!.borderRadius.lg};
   padding: 16px;
+  margin-top: 8px;
   gap: 4px;
 
   .place {
@@ -345,7 +348,7 @@ const SmallCard = styled.div`
 
 const Card = styled.div`
   background: ${(props) => props.theme!.colours["component-btn-background-secondary"]};
-  display: flex-flow;
+  display: flex;
   flex-direction: column;
   border-radius: ${(props) => props.theme!.borderRadius.lg};
   padding: 16px;
