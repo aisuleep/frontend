@@ -227,6 +227,15 @@ export function UserCard(
               </Title>
             </SmallCard>
             </Show>
+            <Show when={props.user.bot}>
+              <SmallCard>
+                <Title>
+                  <Typography variant="modal-title">
+                    {("Creator")}
+                  </Typography>
+                </Title>
+              </SmallCard>
+            </Show>
           </SmallCards>
           <Card>
             <Title>
